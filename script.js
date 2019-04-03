@@ -9,8 +9,8 @@ function getGraph(arr) {
       labels : ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"],
       datasets : [{
         label : "Fatturato",
-        backgroundColor: "rgb(97,206,79)",
-        borderColor: "rgb(247,247,247)",
+        backgroundColor: "rgb(0,0,0,0.2)",
+        borderColor: "rgb(97,206,79)",
         data : arr
       }]
     },
@@ -18,8 +18,38 @@ function getGraph(arr) {
   });
 }
 
+function pushData() {
+
+  $.ajax({
+    url: "http://157.230.17.132:4021/sales",
+    method: "GET",
+    success: function(apiData, stato) {
+
+      if (stato == "success") {
+
+        var array = [0,0,0,0,0,0,0,0,0,0,0,0];
+
+        for (var i = 0; i < apiData.length; i++) {
+
+          var splitData = apiData[i].date.split("/");
+          var month = Number(splitData[1]);
+          var amount = apiData[i].amount;
+              array[month-1] += amount;
+        }
+
+        getGraph(array);
+      }
+    },
+    error: function(richiesta, stato, errori) {
+
+      alert("Errore di connessione: " + errori);
+    },
+  });
+}
+
+
+
 function init() {
 
-var array = [1,2,3,4,5,6,7,8,9,10,11,12];
-  getGraph(array);
+  pushData();
 }
