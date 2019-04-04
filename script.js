@@ -60,6 +60,7 @@ $(document).ready(init);
         if (stato == "success") {
 
           pushData2(apiData);
+          countSalesman(apiData)
         }
       },
       error: (richiesta, stato,  errori) => {
@@ -120,6 +121,66 @@ function getGraph2(object) {
       }]
     },
     option : {}
+  });
+}
+
+
+// Milestone 1: step 2 (lanciata a riga 63)
+
+function countSalesman(object) {
+
+  var obj = {};
+
+  for (var i = 0; i < object.length; i++) {
+
+    var salesman = object[i].salesman;
+    var eachAmount = object[i].amount;
+
+    if (obj[salesman] == null) { //Se non esiste lo imposto a 0 (altrimenti darebbe errore: NaN)
+      obj[salesman] = 0;
+    }
+    obj[salesman] += eachAmount;
+  }
+  getGraphCake(obj);
+}
+
+function getGraphCake(object) {
+
+  var sellers = Object.keys(object);
+  var amount = Object.values(object);
+
+  var ctx = document.getElementById("myChart2").getContext("2d");
+  var chart = new Chart(ctx, {
+    type: "pie",
+    data: {
+      labels: sellers,
+      datasets: [{
+        label: "Ammontare Vendite",
+        backgroundColor: ["rgb(255,99,132)",
+                          "rgb(255,205,86)",
+                          "rgb(54,162,235)",
+                          "rgb(75,192,192)"],
+        borderColor: "rgb(0,0,0)",
+        data: amount
+      }]
+    },
+    options: {
+                    tooltips: {
+                        callbacks: {
+                            label: function(tooltipItem, data) {
+                                var allData = data.datasets[tooltipItem.datasetIndex].data;
+                                var tooltipLabel = data.labels[tooltipItem.index];
+                                var tooltipData = allData[tooltipItem.index];
+                                var total = 0;
+                                for (var i in allData) {
+                                    total += parseFloat(allData[i]); //Usato parseFloat nel caso i valori siano sottoforma di stringa (non è questo il caso)
+                                }
+                                var tooltipPercentage = Math.round((tooltipData / total) * 100);
+                                return tooltipLabel + ': ' + tooltipData + ' (' + tooltipPercentage + '%)';
+                            }
+                        }
+                    }
+                }
   });
 }
 
