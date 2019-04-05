@@ -80,6 +80,13 @@ function getObjectCounter() {
         mom.month(i);
     var month = mom.format("MMMM");
         months[month] = 0;
+    // Carico i mesi nella select del Dom
+    var option = document.createElement("option");
+        option.innerHTML = month;
+        option.setAttribute("value", i);
+
+    var select = document.getElementById("months");
+        select.appendChild(option);
   }
   return months;
 }
@@ -115,6 +122,7 @@ function getGraph2(object) {
       labels : monthArr,
       datasets : [{
         label : "Fatturato",
+        lineTension : 0,
         backgroundColor : "rgb(0,0,0,0.2)",
         borderColor : "rgb(97,206,79)",
         data : amountArr
@@ -122,6 +130,15 @@ function getGraph2(object) {
     },
     option : {}
   });
+
+    $("button").click(function(){
+
+      var month = $("#months").val();
+      var value = $("input").val();
+          value = Number(value);
+      amountArr[month] += value;
+      chart.update();
+    });
 }
 
 
@@ -148,6 +165,8 @@ function getGraphCake(object) {
 
   var sellers = Object.keys(object);
   var amount = Object.values(object);
+
+  optionSellersDomGeneretor(sellers); //Trovato array dei venditori totali lo appendo al Dom
 
   var ctx = document.getElementById("myChart2").getContext("2d");
   var chart = new Chart(ctx, {
@@ -182,7 +201,32 @@ function getGraphCake(object) {
               }
             }
   });
+
+  $("button").click(function(){
+
+    var idseller = $("#sellers").val();
+    var value = $("input").val();
+        value = Number(value);
+
+    amount[idseller] += value;
+    chart.update();
+  });
 }
+
+
+function optionSellersDomGeneretor(arr) { // Lanciata a riga 167 per comodità.
+
+  for (var i = 0; i < arr.length; i++) {
+
+    var option = document.createElement("option");
+    option.innerHTML = arr[i];
+    option.setAttribute("value", i);
+
+    var select = document.getElementById("sellers");
+    select.appendChild(option);
+  }
+}
+
 
 function init() {
 
