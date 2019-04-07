@@ -83,7 +83,7 @@ function getObjectCounter() {
     // Carico i mesi nella select del Dom
     var option = document.createElement("option");
         option.innerHTML = month;
-        option.setAttribute("value", i);
+        option.setAttribute("value", i+1);
 
     var select = document.getElementById("months");
         select.appendChild(option);
@@ -101,6 +101,7 @@ function pushData2(object) {
     var element = object[i];
     var data = element.date;
     var amount = element.amount;
+        amount = Number(amount);
 
     var mom = moment(data, "DD/MM/YYYY");
     var month = mom.locale("it").format("MMMM");
@@ -134,6 +135,7 @@ function getGraph2(object) {
     $("button").click(function(){
 
       var month = $("#months").val();
+          month = Number(month) - 1; //MOMENT IN QUESTO CASO PARTE DA 0 CON GENNAIO
       var value = $("input").val();
           value = Number(value);
       amountArr[month] += value;
@@ -152,6 +154,7 @@ function countSalesman(object) {
 
     var salesman = object[i].salesman;
     var eachAmount = object[i].amount;
+        eachAmount = Number(eachAmount);
 
     if (obj[salesman] == null) { //Se non esiste lo imposto a 0 (altrimenti darebbe errore: NaN)
       obj[salesman] = 0;
@@ -205,11 +208,22 @@ function getGraphCake(object) {
   $("button").click(function(){
 
     var idseller = $("#sellers").val();
+    var nameseller = $("#sellers option[value=" + idseller +"]").text();
+    var idmonth = $("#months").val();
+
+    var mom = moment(idmonth, "M"); //MOMENT IN QUESTO CASO PARTE DA 1 CON GENNAIO
+    var monthMachine = mom.format("MM");
+    var output = "01/" + monthMachine + "/2017";
+
+
+
     var value = $("input").val();
         value = Number(value);
 
     amount[idseller] += value;
     chart.update();
+
+    postNewData(nameseller, value, output);
   });
 }
 
@@ -227,6 +241,28 @@ function optionSellersDomGeneretor(arr) { // Lanciata a riga 167 per comodità.
   }
 }
 
+
+function postNewData(seller, amount, data) {
+
+  $.ajax({
+    url: "http://157.230.17.132:4021/sales",
+    method: "POST",
+    data : {salesman: seller, amount: amount, date: data},
+    success: function(apiData, stato) {
+
+      if (stato == "success") {
+
+        setTimeout(function() {
+          alert("Dato inserito con successo");
+        }, 1000);
+      }
+    },
+    error: function(richiesta, stato, errori) {
+
+      alert("Errore di connessione" + errori);
+    },
+  });
+}
 
 function init() {
 
